@@ -17,7 +17,7 @@ class Controller {
       .catch(next)
   }
   static loginUser(req, res, next) {
-    console.log(req.body)
+    console.log(req.body, 'masuk dari controller user')
     const { username, password } = req.body
     let errors = []
     if (!username.length) errors.push('Username tidak boleh kosong!')
@@ -30,11 +30,44 @@ class Controller {
         let payload = {
           id: data.id,
           username: data.username,
-          role: data.role
+          password: data.password,
+          fullname: data.fullname
         }
-        const id = +data.id
+        // const id = +data.id
         let token = generateToken(payload)
-        res.status(200).json({ msg: 'Login Berhasil!', token, id, payload })
+        res.status(200).json({ msg: 'Login Berhasil!', token, payload })
+      })
+      .catch(next)
+  }
+  static editUser(req, res, next) {
+    const id = +req.params.id
+    const { fullname, username } = req.body
+    const obj = { fullname, username }
+    User.update(obj, { where: {id } })
+      .then(() => {
+        return User.findOne({ where: { id } })
+      })
+      .then(data => {
+        if (!data) throw { name: 'UserNotFound', msg: 'User Not Found'}
+        res.status(200).json({ message: 'User successfully edited'})
+      })
+      .catch(next)
+  }
+  static deleteUser(req, res, next) {
+    const id = +req.params.id
+    User.findOne({ where: { id } })
+      .then(data => {
+        User.destroy({ where: { id } })
+        res.status(200).json({ message: 'User successfully deleted', data })
+      })
+      .catch(next)
+  }
+  static userById(req, res, next) {
+    const id = +req.params.id
+    User.findOne({ where: { id } })
+      .then(data => {
+        if (!data) throw { name: 'UserNotFound', msg: 'User Not Found' }
+        res.status(200).json({ data })
       })
       .catch(next)
   }

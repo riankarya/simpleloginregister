@@ -1,7 +1,7 @@
-const axios = require('axios')
+import axios from 'axios'
 
 const axiosUser = axios.create({
   baseURL: 'http://localhost:3000'
 })
 
-module.exports = { axiosUser }
+export default axiosUser
